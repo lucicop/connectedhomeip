@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/GenericOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Dnssd.h>
@@ -64,7 +65,6 @@ using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::System::Layer;
 
@@ -94,6 +94,7 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 OTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
@@ -180,7 +181,8 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
@@ -201,7 +203,7 @@ CHIP_ERROR AppTask::Init()
         chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
         if (requestor != nullptr)
         {
-            requestor->NotifyUpdateApplied(savedSoftwareVersion);
+            requestor->NotifyUpdateApplied();
         }
     }
 
