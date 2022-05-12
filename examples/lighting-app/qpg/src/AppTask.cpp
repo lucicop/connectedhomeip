@@ -130,7 +130,7 @@ CHIP_ERROR AppTask::Init()
 
     // Enable BLE advertisements
     chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+    ChipLogProgress(NotSpecified, ">>> BLE advertising started. Waiting for Pairing.");
 
     return err;
 }
