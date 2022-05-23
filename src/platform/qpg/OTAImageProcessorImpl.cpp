@@ -47,7 +47,6 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
     if (currentVersion != requestor->GetTargetVersion())
     {
-        ChipLogError(SoftwareUpdate, "ConfirmCurrentImage: currentVersion: %lu, targetVersion: %lu", currentVersion, requestor->GetTargetVersion());
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
